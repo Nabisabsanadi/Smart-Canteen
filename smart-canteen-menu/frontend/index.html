@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Canteen Menu | Quick & Fresh Campus Dining</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-utensils"></i> Smart<span>Canteen</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#menu-section" class="active"><i class="fa-solid fa-book-open"></i> Menu</a>
+                <a href="#admin-section"><i class="fa-solid fa-user-gear"></i> Admin Portal</a>
+            </nav>
+            <div class="nav-actions">
+                <button id="cart-btn" class="btn btn-primary btn-cart">
+                    <i class="fa-solid fa-cart-shopping"></i> My Cart
+                    <span id="cart-count" class="cart-badge">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <span class="hero-tag"><i class="fa-solid fa-bolt"></i> Fast & Fresh Campus Meals</span>
+                <h1>Skip the Long Queues at Campus Canteen</h1>
+                <p>Browse today's fresh menu, order your favorite dishes online, and collect them hassle-free. Made specifically for smart college students.</p>
+                <div class="hero-buttons">
+                    <a href="#menu-section" class="btn btn-accent"><i class="fa-solid fa-burger"></i> Explore Menu</a>
+                    <a href="#admin-section" class="btn btn-outline"><i class="fa-solid fa-plus"></i> Manage Items</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80" alt="Fresh Canteen Food">
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="container main-content">
+        
+        <!-- Menu Section -->
+        <section id="menu-section" class="section">
+            <div class="section-header">
+                <h2>Today's Fresh Menu</h2>
+                <p>Choose from our variety of healthy, delicious, and budget-friendly meals.</p>
+            </div>
+
+            <!-- Controls: Search & Category Filter -->
+            <div class="filter-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search dish by name...">
+                </div>
+                <div class="category-pills" id="category-filters">
+                    <button class="pill-btn active" data-category="all">All Items</button>
+                    <!-- Dynamic categories loaded here -->
+                </div>
+            </div>
+
+            <!-- Menu Grid Container -->
+            <div id="menu-grid" class="menu-grid">
+                <!-- Dynamic menu cards inserted by JS -->
+            </div>
+
+            <!-- Empty / Loading / Error States -->
+            <div id="menu-loading" class="state-container">
+                <div class="spinner"></div>
+                <p>Fetching today's delicious menu...</p>
+            </div>
+            <div id="menu-empty" class="state-container hidden">
+                <i class="fa-solid fa-plate-wheat state-icon"></i>
+                <h3>No Items Found</h3>
+                <p>Try searching for something else or pick a different category.</p>
+            </div>
+            <div id="menu-error" class="state-container hidden">
+                <i class="fa-solid fa-triangle-exclamation state-icon error-icon"></i>
+                <h3>Unable to Load Menu</h3>
+                <p id="error-message">Make sure your backend server and Supabase connection are active.</p>
+                <button onclick="fetchMenuItems()" class="btn btn-secondary mt-3">Retry</button>
+            </div>
+        </section>
+
+        <!-- Admin Portal Section -->
+        <section id="admin-section" class="section admin-section">
+            <div class="section-header">
+                <h2>Admin & Canteen Management</h2>
+                <p>Add new menu items, update prices, manage availability, or view recent orders.</p>
+            </div>
+
+            <div class="admin-grid">
+                <!-- Add / Edit Menu Form -->
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h3 id="form-title"><i class="fa-solid fa-plus-circle"></i> Add New Menu Item</h3>
+                        <button id="cancel-edit-btn" class="btn btn-sm btn-outline hidden">Cancel Edit</button>
+                    </div>
+                    <form id="menu-form" class="admin-form">
+                        <input type="hidden" id="item-id">
+                        
+                        <div class="form-group">
+                            <label for="item-name">Dish Name *</label>
+                            <input type="text" id="item-name" placeholder="e.g. Masala Dosa" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="item-price">Price (₹) *</label>
+                                <input type="number" id="item-price" step="0.5" min="0" placeholder="e.g. 60" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="item-category">Category *</label>
+                                <select id="item-category" required>
+                                    <option value="">Select Category</option>
+                                    <!-- Dynamic options loaded by JS -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-description">Description</label>
+                            <textarea id="item-description" rows="3" placeholder="Brief description of ingredients or taste..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-image">Image URL</label>
+                            <input type="url" id="item-image" placeholder="https://images.unsplash.com/...">
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="switch-label">
+                                <input type="checkbox" id="item-available" checked>
+                                <span>Mark as Available in Canteen</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" id="submit-form-btn" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-paper-plane"></i> Save Menu Item
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Live Orders Monitor -->
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-list-check"></i> Recent Orders Monitor</h3>
+                        <button onclick="fetchOrders()" class="btn btn-sm btn-outline"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                    </div>
+                    <div id="orders-list" class="orders-list">
+                        <!-- Dynamic orders loaded by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Cart Modal Overlay -->
+    <div id="cart-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-cart-shopping"></i> Your Canteen Basket</h3>
+                <button id="close-cart-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items" class="cart-items-list">
+                    <!-- Dynamic cart items loaded by JS -->
+                </div>
+                <div id="empty-cart-msg" class="empty-cart-msg hidden">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <p>Your basket is currently empty.</p>
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Total Items:</span>
+                        <span id="cart-total-count">0</span>
+                    </div>
+                    <div class="summary-row total-price">
+                        <span>Total Amount:</span>
+                        <span>₹<span id="cart-total-price">0.00</span></span>
+                    </div>
+                </div>
+
+                <!-- Customer Details Form -->
+                <form id="checkout-form" class="checkout-form">
+                    <h4>Customer Checkout Details</h4>
+                    <div class="form-group">
+                        <label for="customer-name">Full Name *</label>
+                        <input type="text" id="customer-name" placeholder="e.g. Alex Johnson" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Mobile Phone Number *</label>
+                        <input type="tel" id="customer-phone" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+                    </div>
+                    <button type="submit" class="btn btn-accent btn-block mt-3">
+                        <i class="fa-solid fa-check-circle"></i> Confirm & Place Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <p>&copy; 2026 Smart Canteen System. Built for College Campuses.</p>
+            <p class="footer-sub">Powered by Node.js, Express, Supabase PostgreSQL & Vanilla JS</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
